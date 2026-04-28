@@ -1,1 +1,1597 @@
-# patients-pipeline
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patients Pipeline — Home Care Patient Acquisition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white: #ffffff;
+    --off-white: #f8f7f5;
+    --navy: #0d1b2a;
+    --navy-mid: #122339;
+    --navy-light: #1a3352;
+    --teal: #0284c7;
+    --teal-dim: rgba(2,132,199,0.10);
+    --teal-glow: rgba(2,132,199,0.22);
+    --gray-100: #f1f0ee;
+    --gray-200: #e4e2de;
+    --gray-400: #9b9894;
+    --gray-600: #6b6966;
+    --gray-800: #3a3836;
+    --font-head: 'EB Garamond', Georgia, serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--white);
+    color: var(--navy);
+    overflow-x: hidden;
+    }
+
+
+    100% { width: 120px; height: 120px; opacity: 0; }
+  }
+
+  /* ─── NAVIGATION ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%;
+    height: 72px;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--gray-200);
+    transition: box-shadow 0.3s;
+  }
+  nav.scrolled { box-shadow: 0 4px 40px rgba(13,27,42,0.08); }
+
+  .nav-logo {
+    text-decoration: none;
+    display: flex; align-items: center;
+    flex-shrink: 0;
+  }
+  .nav-logo-img {
+    height: 40px;
+    width: auto;
+    max-width: 180px;
+    object-fit: contain;
+    display: block;
+  }
+  .footer-logo-img {
+    height: 28px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    /* logo is dark on white — invert for navy footer */
+    filter: brightness(0) invert(1);
+    opacity: 0.85;
+  }
+  .footer-logo-img:hover { opacity: 1; }
+
+  .nav-links {
+    display: flex; align-items: center; gap: 32px;
+    list-style: none;
+    justify-content: center;
+  }
+  .nav-links a {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    transition: color 0.2s;
+    position: relative;
+    white-space: nowrap;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -3px; left: 0; right: 100%;
+    height: 1.5px; background: var(--teal);
+    transition: right 0.25s cubic-bezier(0.4,0,0.2,1);
+  }
+  .nav-links a:hover { color: var(--navy); }
+  .nav-links a:hover::after { right: 0; }
+  .btn-nav {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--navy);
+    background: var(--teal);
+    border: none;
+    padding: 11px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(2,132,199,0.3);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .btn-nav:hover {
+    background: #0369a1;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(2,132,199,0.4);
+  }
+
+  /* ─── STICKY CTA ─── */
+  #sticky-cta {
+    position: fixed; bottom: 28px; right: 28px; z-index: 999;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--teal);
+    color: var(--navy);
+    padding: 14px 24px;
+    border-radius: 50px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.03em;
+    box-shadow: 0 8px 32px rgba(2,132,199,0.4);
+      text-decoration: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.35s, transform 0.35s, box-shadow 0.2s;
+    pointer-events: none;
+  }
+  #sticky-cta.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+  #sticky-cta:hover { box-shadow: 0 12px 40px rgba(2,132,199,0.55); transform: translateY(-2px); }
+  #sticky-cta svg { width: 16px; height: 16px; }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 120px 5% 80px;
+    background: var(--white);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-grid {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(13,27,42,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(13,27,42,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--teal);
+    background: var(--teal-dim);
+    border: 1px solid rgba(2,132,199,0.3);
+    padding: 6px 16px;
+    border-radius: 100px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    opacity: 0; transform: translateY(16px);
+    animation: fadeUp 0.7s 0.1s cubic-bezier(0.2,0.8,0.3,1) forwards;
+  }
+  .hero-badge .pulse {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--teal);
+    animation: pulseDot 2s infinite;
+  }
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .hero-headline {
+    font-family: var(--font-head);
+    font-size: clamp(2.8rem, 6vw, 5.2rem);
+    font-weight: 500;
+    color: var(--navy);
+    text-align: center;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    max-width: 820px;
+    opacity: 0; transform: translateY(20px);
+    animation: fadeUp 0.8s 0.25s cubic-bezier(0.2,0.8,0.3,1) forwards;
+  }
+  .hero-headline em { font-style: italic; color: var(--teal); }
+
+  .hero-sub {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--gray-600);
+    text-align: center;
+    max-width: 520px;
+    margin-top: 20px;
+    line-height: 1.65;
+    opacity: 0; transform: translateY(16px);
+    animation: fadeUp 0.8s 0.4s cubic-bezier(0.2,0.8,0.3,1) forwards;
+  }
+
+  .hero-actions {
+    display: flex; gap: 14px; margin-top: 40px; flex-wrap: wrap; justify-content: center;
+    opacity: 0; transform: translateY(14px);
+    animation: fadeUp 0.8s 0.55s cubic-bezier(0.2,0.8,0.3,1) forwards;
+  }
+
+  .btn-primary {
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.03em;
+    color: var(--navy);
+    background: var(--teal);
+    border: none;
+    padding: 14px 32px;
+    border-radius: 6px;
+      text-decoration: none;
+    transition: transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(2,132,199,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(2,132,199,0.5); }
+
+  .btn-secondary {
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--navy);
+    background: transparent;
+    border: 1.5px solid var(--gray-200);
+    padding: 14px 28px;
+    border-radius: 6px;
+      text-decoration: none;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--navy); transform: translateY(-2px); }
+
+  /* VSL Card */
+  .vsl-wrap {
+    margin-top: 60px; width: 100%; max-width: 760px;
+    opacity: 0; transform: translateY(24px) scale(0.98);
+    animation: fadeUp 0.9s 0.7s cubic-bezier(0.2,0.8,0.3,1) forwards;
+  }
+  .vsl-card {
+    background: var(--navy);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(13,27,42,0.22), 0 0 0 1px rgba(255,255,255,0.06);
+    position: relative;
+  }
+  .vsl-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 20px;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .vsl-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .vsl-dot:nth-child(1) { background: #ff5f57; }
+  .vsl-dot:nth-child(2) { background: #febc2e; }
+  .vsl-dot:nth-child(3) { background: #28c840; }
+  .vsl-label {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: rgba(255,255,255,0.3); margin-left: auto; letter-spacing: 0.06em;
+  }
+  .vsl-frame {
+    position: relative; width: 100%; padding-bottom: 56.25%;
+    background: #060e17;
+  }
+  .vsl-frame iframe {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: none;
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ─── PROOF STRIP ─── */
+  #proof {
+    background: var(--gray-100);
+    border-top: 1px solid var(--gray-200);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 28px 0;
+    overflow: hidden;
+  }
+  .proof-label {
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--gray-400);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .proof-track-wrap { overflow: hidden; position: relative; }
+  .proof-track-wrap::before, .proof-track-wrap::after {
+    content: ''; position: absolute; top: 0; bottom: 0; width: 120px; z-index: 2; pointer-events: none;
+  }
+  .proof-track-wrap::before { left: 0; background: linear-gradient(to right, var(--gray-100), transparent); }
+  .proof-track-wrap::after { right: 0; background: linear-gradient(to left, var(--gray-100), transparent); }
+
+  .proof-track {
+    display: flex; gap: 32px; align-items: center;
+    width: max-content;
+    animation: scrollLeft 35s linear infinite;
+  }
+  @keyframes scrollLeft {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .proof-track:hover { animation-play-state: paused; }
+
+
+  .proof-logo {
+    display: flex; align-items: center; gap: 10px; white-space: nowrap;
+    font-family: var(--font-body); font-size: 0.82rem; font-weight: 600;
+    color: var(--gray-600); letter-spacing: 0.02em; opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .proof-logo:hover { opacity: 1; }
+  .proof-logo svg { width: 22px; height: 22px; }
+  .proof-logo-item {
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 8px; flex-shrink: 0;
+    opacity: 0.75; transition: opacity 0.25s;
+  }
+  .proof-logo-item:hover { opacity: 1; }
+  .proof-img {
+    object-fit: contain; display: block;
+    height: 48px; width: auto;
+    filter: grayscale(20%);
+    transition: filter 0.25s;
+  }
+  .proof-img--wide { max-width: 140px; }
+  .proof-img--sq  { max-width: 80px; height: 48px; }
+  .proof-img--small { height: 40px; }
+  .proof-logo-item:hover .proof-img { filter: grayscale(0%); }
+
+  /* ─── SECTION SHARED ─── */
+  section { padding: 100px 5%; }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::before {
+    content: ''; display: block;
+    width: 24px; height: 1.5px; background: var(--teal);
+  }
+  .section-title {
+    font-family: var(--font-head);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 500;
+    color: var(--navy);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    max-width: 600px;
+  }
+  .section-title em { font-style: italic; }
+  .section-sub {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--gray-600);
+    max-width: 500px;
+    margin-top: 16px;
+    line-height: 1.7;
+  }
+
+  /* ─── REVEAL ON SCROLL ─── */
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.7s cubic-bezier(0.2,0.8,0.3,1), transform 0.7s cubic-bezier(0.2,0.8,0.3,1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
+  .reveal-delay-6 { transition-delay: 0.6s; }
+
+  /* ─── HOW IT WORKS / 4 PHASES ─── */
+  #how-it-works {
+    background: var(--white);
+    color: var(--navy);
+    padding: 100px 5%;
+  }
+  #how-it-works .section-label { color: var(--teal); }
+  #how-it-works .section-title { color: var(--navy); max-width: 700px; }
+  #how-it-works .section-sub { color: var(--gray-600); }
+
+  .phases-wrap {
+    margin-top: 72px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+  .phases-wrap::before {
+    content: '';
+    position: absolute;
+    left: 47px;
+    top: 60px;
+    bottom: 60px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--teal), rgba(2,132,199,0.08));
+    z-index: 0;
+  }
+  .phase-row {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 36px;
+    align-items: flex-start;
+    padding: 40px 0;
+    border-bottom: 1px solid var(--gray-200);
+    position: relative;
+    z-index: 1;
+  }
+  .phase-row:last-child { border-bottom: none; }
+  .phase-row:hover .phase-pill-num { background: var(--teal); color: var(--navy); }
+  .phase-left {
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: 4px;
+  }
+  .phase-pill-num {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--navy); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.06em; flex-shrink: 0; position: relative; z-index: 2;
+    transition: background 0.3s, color 0.3s;
+    box-shadow: 0 0 0 6px var(--white), 0 0 0 7px var(--gray-200);
+  }
+  .phase-right { padding-top: 8px; }
+  .phase-tag {
+    font-family: var(--font-mono); font-size: 0.66rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .phase-tag::after {
+    content: ''; display: block; height: 1px; width: 32px;
+    background: var(--teal); opacity: 0.4;
+  }
+  .phase-title {
+    font-family: var(--font-head);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 600; color: var(--navy);
+    line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 16px;
+  }
+  .phase-body {
+    font-family: var(--font-body); font-size: 0.975rem;
+    color: var(--gray-600); line-height: 1.75;
+    max-width: 620px; margin-bottom: 24px;
+  }
+  .phase-bullets { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; }
+  .phase-bullet {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-body); font-size: 0.82rem; font-weight: 500;
+    color: var(--navy); background: var(--off-white);
+    border: 1px solid var(--gray-200); padding: 6px 14px; border-radius: 100px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .phase-bullet:hover { border-color: var(--teal); background: var(--teal-dim); }
+  .phase-bullet svg { width: 13px; height: 13px; stroke: var(--teal); fill: none; stroke-width: 2; flex-shrink: 0; }
+  @media (max-width: 640px) {
+    .phases-wrap::before { left: 27px; }
+    .phase-row { grid-template-columns: 60px 1fr; gap: 20px; }
+    .phase-pill-num { width: 44px; height: 44px; font-size: 0.65rem; }
+  }
+
+  /* ─── OLD HIW (kept for selector continuity) ─── */
+  .hiw-card { cursor: default; }
+
+
+
+  /* ─── EXCLUSIVE OFFER ─── */
+  #exclusive-offer {
+    background: var(--off-white);
+  }
+  .offer-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+    margin-top: 60px;
+  }
+  .offer-card {
+    background: var(--navy);
+    border-radius: 20px;
+    padding: 48px 40px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(13,27,42,0.18);
+  }
+  .offer-card::before {
+    content: ''; position: absolute;
+    top: -80px; right: -80px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: var(--teal);
+    opacity: 0.06;
+  }
+  .offer-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-mono); font-size: 0.65rem;
+    color: var(--teal); background: rgba(2,132,199,0.12);
+    border: 1px solid rgba(2,132,199,0.25);
+    padding: 5px 12px; border-radius: 100px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .offer-title {
+    font-family: var(--font-head);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--white);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  .offer-items { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-bottom: 32px; }
+  .offer-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-family: var(--font-body); font-size: 0.875rem;
+    color: rgba(255,255,255,0.75); line-height: 1.5;
+  }
+  .offer-check {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--teal); flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .offer-check svg { width: 10px; height: 10px; stroke: var(--navy); fill: none; stroke-width: 2.5; }
+
+  .offer-price {
+    display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px;
+  }
+  .offer-price-val {
+    font-family: var(--font-head); font-size: 3rem;
+    font-weight: 600; color: var(--teal);
+  }
+  .offer-price-label {
+    font-family: var(--font-body); font-size: 0.875rem;
+    color: rgba(255,255,255,0.4);
+  }
+  .offer-disclaimer {
+    font-family: var(--font-body); font-size: 0.75rem;
+    color: rgba(255,255,255,0.3); margin-bottom: 28px;
+  }
+  .offer-cta {
+    cursor: pointer;
+    display: block; text-align: center;
+    background: var(--teal); color: var(--navy);
+    font-family: var(--font-body); font-weight: 700;
+    font-size: 0.9rem; letter-spacing: 0.03em;
+    padding: 16px 32px; border-radius: 8px;
+    text-decoration: none;
+    transition: transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(2,132,199,0.3);
+  }
+  .offer-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(2,132,199,0.5); }
+
+  .offer-right { }
+  .offer-right-title {
+    font-family: var(--font-head);
+    font-size: 2rem; font-weight: 500;
+    color: var(--navy); letter-spacing: -0.02em;
+    line-height: 1.2; margin-bottom: 20px;
+  }
+  .offer-right-text {
+    font-family: var(--font-body); font-size: 0.95rem;
+    color: var(--gray-600); line-height: 1.7; margin-bottom: 28px;
+  }
+  .offer-guarantees { display: flex; flex-direction: column; gap: 16px; }
+  .guarantee-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 18px 20px;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .guarantee-item:hover { border-color: var(--teal); box-shadow: 0 4px 20px rgba(2,132,199,0.1); }
+  .guarantee-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--teal-dim); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .guarantee-icon svg { width: 18px; height: 18px; stroke: var(--teal); fill: none; stroke-width: 1.5; }
+  .guarantee-text h4 {
+    font-family: var(--font-body); font-size: 0.875rem; font-weight: 600;
+    color: var(--navy); margin-bottom: 4px;
+  }
+  .guarantee-text p {
+    font-family: var(--font-body); font-size: 0.8rem;
+    color: var(--gray-600); line-height: 1.55;
+  }
+
+  /* ─── ROI CALCULATOR ─── */
+  #roi-calculator {
+    background: var(--white);
+  }
+  .calc-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 60px;
+    margin-top: 60px;
+    align-items: start;
+  }
+  .calc-card {
+    background: var(--navy);
+    border-radius: 20px;
+    padding: 48px 40px;
+    box-shadow: 0 32px 80px rgba(13,27,42,0.15);
+  }
+  .calc-label {
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.3); margin-bottom: 24px;
+  }
+  .calc-input-group { margin-bottom: 36px; }
+  .calc-input-label {
+    font-family: var(--font-body); font-size: 0.875rem;
+    font-weight: 600; color: rgba(255,255,255,0.7); margin-bottom: 12px;
+    display: block;
+  }
+  .calc-slider-wrap { position: relative; }
+  .calc-slider {
+    cursor: pointer;
+    -webkit-appearance: none;
+    width: 100%; height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 100px;
+    outline: none;
+    }
+  .calc-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%; background: var(--teal);
+      box-shadow: 0 0 0 4px rgba(2,132,199,0.2);
+    transition: box-shadow 0.2s;
+  }
+  .calc-slider::-webkit-slider-thumb:hover { box-shadow: 0 0 0 8px rgba(2,132,199,0.2); }
+  .calc-amount {
+    font-family: var(--font-head); font-size: 2.5rem;
+    font-weight: 600; color: var(--teal);
+    text-align: center; margin-top: 16px;
+  }
+
+  .calc-results {
+    display: flex; flex-direction: column; gap: 16px;
+    margin-top: 8px;
+  }
+  .calc-result-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    transition: background 0.2s;
+  }
+  .calc-result-row:hover { background: rgba(2,132,199,0.05); }
+  .calc-result-label {
+    font-family: var(--font-body); font-size: 0.8rem;
+    color: rgba(255,255,255,0.45);
+  }
+  .calc-result-val {
+    font-family: var(--font-mono); font-size: 1.1rem;
+    font-weight: 700; color: var(--white);
+  }
+  .calc-result-val.highlight { color: var(--teal); font-size: 1.4rem; }
+
+  .calc-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 8px 0; }
+
+  .calc-right-content { }
+  .calc-chart {
+    background: var(--off-white);
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    padding: 36px;
+    margin-bottom: 24px;
+  }
+  .chart-title {
+    font-family: var(--font-body); font-size: 0.8rem;
+    font-weight: 600; color: var(--gray-600);
+    letter-spacing: 0.04em; text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .chart-bars { display: flex; align-items: flex-end; gap: 12px; height: 160px; }
+  .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0; height: 100%; }
+  .chart-bar-val {
+    font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700;
+    color: var(--navy); margin-bottom: 6px; height: 18px; line-height: 18px;
+    transition: all 0.4s cubic-bezier(0.2,0.8,0.3,1);
+  }
+  .chart-bar-val.teal { color: var(--teal); }
+  .chart-bar-track {
+    flex: 1; width: 100%; display: flex; align-items: flex-end;
+    background: var(--gray-100); border-radius: 4px 4px 0 0; overflow: hidden;
+  }
+  .chart-bar {
+    width: 100%; border-radius: 4px 4px 0 0;
+    transition: height 0.55s cubic-bezier(0.2,0.8,0.3,1);
+    background: var(--navy); min-height: 4px; height: 4px;
+  }
+  .chart-bar.active { background: var(--teal); }
+  .chart-bar-label {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    color: var(--gray-400); text-align: center; margin-top: 6px;
+  }
+
+  .calc-formula {
+    font-family: var(--font-mono); font-size: 0.72rem;
+    color: var(--gray-600); line-height: 1.8;
+    background: var(--off-white);
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 20px 24px;
+  }
+  .formula-line { display: flex; gap: 12px; align-items: center; }
+  .formula-op { color: var(--teal); font-weight: 700; }
+  .formula-val { color: var(--navy); font-weight: 700; }
+
+  /* ─── TESTIMONIALS ─── */
+  #testimonials { background: var(--off-white); overflow: hidden; }
+  .testi-track-wrap {
+    margin-top: 52px; overflow: hidden; position: relative;
+  }
+  .testi-track-wrap::before, .testi-track-wrap::after {
+    content: ''; position: absolute; top: 0; bottom: 0;
+    width: 80px; z-index: 2; pointer-events: none;
+  }
+  .testi-track-wrap::before { left: 0; background: linear-gradient(to right, var(--off-white), transparent); }
+  .testi-track-wrap::after { right: 0; background: linear-gradient(to left, var(--off-white), transparent); }
+
+  .testi-track {
+    display: flex; gap: 20px; width: max-content;
+    animation: scrollLeft 45s linear infinite;
+  }
+  .testi-track:hover { animation-play-state: paused; }
+
+  .testi-card {
+    width: 320px; flex-shrink: 0;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 14px;
+    padding: 28px;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .testi-card:hover {
+    border-color: rgba(2,132,199,0.4);
+    box-shadow: 0 12px 40px rgba(13,27,42,0.08);
+    transform: translateY(-3px);
+  }
+  .testi-stars { display: flex; gap: 3px; margin-bottom: 14px; }
+  .testi-stars svg { width: 14px; height: 14px; fill: #f5a623; }
+  .testi-text {
+    font-family: var(--font-body); font-size: 0.875rem;
+    color: var(--gray-800); line-height: 1.65;
+    margin-bottom: 20px;
+  }
+  .testi-author { display: flex; align-items: center; gap: 12px; }
+  .testi-name {
+    font-family: var(--font-body); font-size: 0.875rem; font-weight: 600;
+    color: var(--navy); display: block;
+  }
+  .testi-role {
+    font-family: var(--font-body); font-size: 0.75rem;
+    color: var(--gray-400); display: block;
+  }
+
+  /* ─── WORK WITH US ─── */
+  #work-with-us {
+    background: var(--navy);
+    color: var(--white);
+    text-align: center;
+  }
+  #work-with-us .section-label { justify-content: center; color: var(--teal); }
+  #work-with-us .section-label::before { display: none; }
+  #work-with-us .section-title {
+    color: var(--white); max-width: 100%;
+    margin: 0 auto; text-align: center;
+  }
+  #work-with-us .section-sub { color: rgba(255,255,255,0.5); margin: 16px auto 0; text-align: center; }
+
+  .calendar-wrap {
+    margin-top: 56px;
+    background: var(--white);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.3);
+    min-height: 600px;
+  }
+  .calendar-wrap iframe {
+    width: 100%; min-height: 600px; border: none; display: block;
+  }
+
+  /* ─── FAQ VIDEO ─── */
+  .faq-vsl-wrap {
+    width: 100%; max-width: 820px; margin: 0 auto;
+  }
+  .faq-vsl-card {
+    background: var(--navy-mid);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06);
+  }
+  .faq-vsl-frame {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    background: #060e17;
+  }
+  .faq-vsl-frame video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--navy);
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding: 40px 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 20px;
+  }
+  .footer-brand { display: flex; align-items: center; text-decoration: none; }
+  .footer-legal {
+    font-family: var(--font-body); font-size: 0.75rem;
+    color: rgba(255,255,255,0.3);
+  }
+  .footer-badges { display: flex; gap: 12px; align-items: center; }
+  .footer-badge {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.1);
+    padding: 4px 10px; border-radius: 4px; letter-spacing: 0.06em;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .offer-layout, .calc-wrap { grid-template-columns: 1fr; gap: 40px; }
+    .nav-links { display: none; }
+    footer { flex-direction: column; text-align: center; }
+    .hiw-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Animated underline for section header */
+  .underline-teal {
+    display: inline-block; position: relative;
+  }
+  .underline-teal::after {
+    content: ''; position: absolute; bottom: 2px; left: 0; right: 0;
+    height: 3px; background: var(--teal); border-radius: 2px;
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .underline-teal.visible::after { transform: scaleX(1); }
+</style>
+</head>
+<body>
+
+
+<!-- STICKY CTA -->
+<a href="#work-with-us" id="sticky-cta">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+  Book a Strategy Call
+</a>
+
+<!-- NAVIGATION -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">
+    <img src="assets/logo.png" alt="Patients Pipeline" class="nav-logo-img">
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how-it-works">How it Works</a></li>
+    <li><a href="#exclusive-offer">Exclusive Offer</a></li>
+    <li><a href="#roi-calculator">ROI Calculator</a></li>
+    <li><a href="#testimonials">What Others Say</a></li>
+  </ul>
+
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-badge"><div class="pulse"></div>#1 Marketing Firm for Home Care Agencies</div>
+  <h1 class="hero-headline">We help Home Care Agencies <strong style="font-weight:700;">acquire and convert</strong> patients</h1>
+  <p class="hero-sub">The only full-stack patient acquisition system built exclusively for home care.</p>
+  <div class="hero-actions">
+    <a href="#work-with-us" class="btn-primary">Work with Us</a>
+    <a href="#how-it-works" class="btn-secondary">See How it Works</a>
+  </div>
+  <div class="vsl-wrap">
+    <div class="vsl-card">
+      <div class="vsl-header">
+        <div class="vsl-dot"></div><div class="vsl-dot"></div><div class="vsl-dot"></div>
+        <span class="vsl-label">PATIENTS PIPELINE — OVERVIEW</span>
+      </div>
+      <div class="vsl-frame">
+        <iframe src="https://www.loom.com/embed/ce62032bc4bd4a71900e7babecdfadbd" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF STRIP -->
+<div id="proof">
+  <p class="proof-label">Trusted Partners &amp; Certifications</p>
+  <div class="proof-track-wrap">
+    <div class="proof-track" id="proofTrack">
+
+      <div class="proof-logo-item">
+        <img src="https://images.seeklogo.com/logo-png/46/2/meta-business-partner-logo-png_seeklogo-466474.png" alt="Meta Business Partner" class="proof-img proof-img--wide">
+      </div>
+      <div class="proof-logo-item">
+        <img src="assets/google-partner.png" alt="Google Partner" class="proof-img proof-img--sq">
+      </div>
+      <div class="proof-logo-item">
+        <img src="https://directory.gohighlevel.com/images/HighLevel-Logo_Full-Color_Dark-Blue_Artwork.png" alt="HighLevel" class="proof-img proof-img--wide">
+      </div>
+      <div class="proof-logo-item">
+        <img src="https://chambermaster.blob.core.windows.net/images/customers/1551/members/2060/logos/MEMBER_PAGE_HEADER/Color_Stacked_RGB_transparent_bkgd_(2).png" alt="Right at Home" class="proof-img proof-img--sq">
+      </div>
+      <div class="proof-logo-item">
+        <img src="https://www.accessiblehomehealthcare.com/wp-content/uploads/2018/10/ahhc-logo.png" alt="Accessible Home Health Care" class="proof-img proof-img--wide">
+      </div>
+      <div class="proof-logo-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Claude_AI_symbol.svg/1280px-Claude_AI_symbol.svg.png" alt="Claude AI" class="proof-img proof-img--sq proof-img--small">
+      </div>
+      <div class="proof-logo-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/ChatGPT-Logo.svg/500px-ChatGPT-Logo.svg.png" alt="ChatGPT" class="proof-img proof-img--sq">
+      </div>
+      <div class="proof-logo-item">
+        <img src="assets/hipaa.png" alt="HIPAA" class="proof-img proof-img--wide">
+      </div>
+      <div class="proof-logo-item">
+        <img src="https://www.ilp-inc.com/wp-content/uploads/certification-baa.png" alt="BAA Compliant" class="proof-img proof-img--sq">
+      </div>
+      <!-- Duplicate set for seamless infinite scroll -->
+      <div class="proof-logo-item">
+        <img src="https://images.seeklogo.com/logo-png/46/2/meta-business-partner-logo-png_seeklogo-466474.png" alt="Meta Business Partner" class="proof-img proof-img--wide">
+      </div>
+      <div class="proof-logo-item">
+        <img src="assets/google-partner.png" alt="Google Partner" class="proof-img proof-img--sq">
+      </div>
+      <div class="proof-logo-item">
+        <img src="https://directory.gohighlevel.com/images/HighLevel-Logo_Full-Color_Dark-Blue_Artwork.png" alt="HighLevel" class="proof-img proof-img--wide">
+      </div>
+      <div class="proof-logo-item">
+        <img src="https://chambermaster.blob.core.windows.net/images/customers/1551/members/2060/logos/MEMBER_PAGE_HEADER/Color_Stacked_RGB_transparent_bkgd_(2).png" alt="Right at Home" class="proof-img proof-img--sq">
+      </div>
+      <div class="proof-logo-item">
+        <img src="https://www.accessiblehomehealthcare.com/wp-content/uploads/2018/10/ahhc-logo.png" alt="Accessible Home Health Care" class="proof-img proof-img--wide">
+      </div>
+      <div class="proof-logo-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Claude_AI_symbol.svg/1280px-Claude_AI_symbol.svg.png" alt="Claude AI" class="proof-img proof-img--sq proof-img--small">
+      </div>
+      <div class="proof-logo-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/ChatGPT-Logo.svg/500px-ChatGPT-Logo.svg.png" alt="ChatGPT" class="proof-img proof-img--sq">
+      </div>
+      <div class="proof-logo-item">
+        <img src="assets/hipaa.png" alt="HIPAA" class="proof-img proof-img--wide">
+      </div>
+      <div class="proof-logo-item">
+        <img src="https://www.ilp-inc.com/wp-content/uploads/certification-baa.png" alt="BAA Compliant" class="proof-img proof-img--sq">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="reveal">
+    <div class="section-label">The System</div>
+    <h2 class="section-title">4 Phases to a Predictable<em> Patient Pipeline</em></h2>
+    <p class="section-sub">A complete, sequenced system — each phase builds on the last until your census grows automatically, month after month.</p>
+  </div>
+
+  <div class="phases-wrap">
+
+    <!-- PHASE 1 -->
+    <div class="phase-row reveal reveal-delay-1">
+      <div class="phase-left">
+        <div class="phase-pill-num">01</div>
+      </div>
+      <div class="phase-right">
+        <div class="phase-tag">Acquisition Phase</div>
+        <h3 class="phase-title">Create a Direct Stream of Qualified Patients</h3>
+        <p class="phase-body">We deploy precision-targeted paid campaigns on the world's largest social platforms — reaching families actively searching for home care, not passive scrollers. Every dollar of ad spend is directed at high-intent consumers who are ready to make a care decision now, not later. Your agency gets in front of them first, consistently.</p>
+        <ul class="phase-bullets">
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Meta &amp; Facebook Ads</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Google Search &amp; Display</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>High-intent audience targeting</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>HIPAA-compliant ad creative</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Weekly campaign optimization</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="phase-row reveal reveal-delay-2">
+      <div class="phase-left">
+        <div class="phase-pill-num">02</div>
+      </div>
+      <div class="phase-right">
+        <div class="phase-tag">Conversion Phase</div>
+        <h3 class="phase-title">Capture, Engage &amp; Filter Every Prospect</h3>
+        <p class="phase-body">Traffic alone means nothing without a system to catch it. We install conversion-engineered landing pages built specifically for home care, backed by AI intake agents that respond in under 90 seconds — 24 hours a day, 7 days a week. Every lead is engaged instantly via SMS and email sequences, then filtered so only qualified prospects reach your team.</p>
+        <ul class="phase-bullets">
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Custom landing pages</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>AI intake bot (24/7)</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Automated SMS sequences</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Email nurture campaigns</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>CRM pipeline automation</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="phase-row reveal reveal-delay-3">
+      <div class="phase-left">
+        <div class="phase-pill-num">03</div>
+      </div>
+      <div class="phase-right">
+        <div class="phase-tag">Predictability Phase</div>
+        <h3 class="phase-title">Turn 1 Patient Into 2 — Automatically</h3>
+        <p class="phase-body">Once a patient is under your care, the system keeps working. We deploy structured Google review campaigns that build your 5-star authority and drive organic inbound traffic. Simultaneously, a referral incentive program turns satisfied families, discharge planners, and physicians into a steady source of warm referrals — compounding your census growth without additional ad spend.</p>
+        <ul class="phase-bullets">
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Google review generation</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>5-star reputation management</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Referral incentive program</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Professional referral outreach</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Organic traffic growth</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PHASE 4 -->
+    <div class="phase-row reveal reveal-delay-4">
+      <div class="phase-left">
+        <div class="phase-pill-num">04</div>
+      </div>
+      <div class="phase-right">
+        <div class="phase-tag">Continuity Phase</div>
+        <h3 class="phase-title">Keep Your Pipeline Active — Quarter After Quarter</h3>
+        <p class="phase-body">Your existing database is a dormant goldmine. Every quarter, we launch targeted reactivation campaigns via email and SMS — re-engaging cold leads, past inquiries, and long-term prospects who weren't ready before but may be now. This keeps revenue flowing from contacts you already own, without spending a dollar more on acquisition.</p>
+        <ul class="phase-bullets">
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Quarterly reactivation campaigns</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Email &amp; SMS re-engagement</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Dormant lead revival</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Long-term prospect nurture</li>
+          <li class="phase-bullet"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Pipeline always-on cadence</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- EXCLUSIVE OFFER -->
+<section id="exclusive-offer">
+  <div class="reveal">
+    <div class="section-label">Limited Availability</div>
+    <h2 class="section-title">The <em>Offer</em></h2>
+    <p class="section-sub">One complete system. Built for your agency. Exclusive to one operator per market.</p>
+  </div>
+  <div class="offer-layout">
+    <div class="offer-card reveal reveal-delay-2">
+      <div class="offer-badge">
+        <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#0284c7"/></svg>
+        Accepting New Clients
+      </div>
+      <h3 class="offer-title">Full-Stack Patient Acquisition System</h3>
+      <ul class="offer-items">
+        <li class="offer-item"><div class="offer-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>Done-for-you Meta + Google ad campaigns</li>
+        <li class="offer-item"><div class="offer-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>Custom HIPAA-compliant landing pages</li>
+        <li class="offer-item"><div class="offer-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>AI intake bot + 24/7 lead qualification</li>
+        <li class="offer-item"><div class="offer-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>Full CRM build-out in HighLevel</li>
+        <li class="offer-item"><div class="offer-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>Automated SMS / email nurture sequences</li>
+        <li class="offer-item"><div class="offer-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>Google Review authority campaigns</li>
+        <li class="offer-item"><div class="offer-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>Referral incentive program design</li>
+        <li class="offer-item"><div class="offer-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>Database reactivation campaign</li>
+        <li class="offer-item"><div class="offer-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>Weekly performance reporting dashboard</li>
+        <li class="offer-item"><div class="offer-check"><svg viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg></div>Dedicated account strategist</li>
+      </ul>
+      <div class="offer-price">
+        <span class="offer-price-val">Custom</span>
+        <span class="offer-price-label">pricing based on market &amp; census goal</span>
+      </div>
+      <p class="offer-disclaimer">Exclusive territory rights — one agency per market. Spots are limited.</p>
+      <a href="#work-with-us" class="offer-cta">Claim Your Market</a>
+    </div>
+    <div class="offer-right reveal reveal-delay-3">
+      <h3 class="offer-right-title">Why agencies choose us over any other marketing option</h3>
+      <p class="offer-right-text">We don't do general healthcare marketing. We don't work with hospitals, clinics, or med spas. Every system we build, every ad we write, every workflow we deploy is built specifically for private-pay and insurance-based home care.</p>
+      <div class="offer-guarantees">
+        <div class="guarantee-item">
+          <div class="guarantee-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="guarantee-text">
+            <h4>Market Exclusivity</h4>
+            <p>We take only one home care client per market. Your territory is yours. No competitor gets our system.</p>
+          </div>
+        </div>
+        <div class="guarantee-item">
+          <div class="guarantee-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+          <div class="guarantee-text">
+            <h4>Performance Accountability</h4>
+            <p>You see every lead, every cost-per-lead, every booking. Full transparency on what your ad dollars produce each week.</p>
+          </div>
+        </div>
+        <div class="guarantee-item">
+          <div class="guarantee-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="guarantee-text">
+            <h4>Fast Launch</h4>
+            <p>First campaigns live within 14 days of onboarding. We run fast, iterate faster, and don't hide behind strategy decks.</p>
+          </div>
+        </div>
+        <div class="guarantee-item">
+          <div class="guarantee-icon"><svg viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+          <div class="guarantee-text">
+            <h4>HIPAA + BAA Covered</h4>
+            <p>Full Business Associate Agreement in place. Your leads, your data — protected and compliant from day one.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROI CALCULATOR -->
+<section id="roi-calculator">
+  <div class="reveal">
+    <div class="section-label">Your Numbers</div>
+    <h2 class="section-title">ROI <em>Calculator</em></h2>
+    <p class="section-sub">Adjust your monthly ad spend and see exactly how many patients you can expect — and what that's worth.</p>
+  </div>
+  <div class="calc-wrap">
+    <div class="calc-card reveal reveal-delay-2">
+      <div class="calc-label">// PATIENT ACQUISITION MODEL</div>
+      <div class="calc-input-group">
+        <label class="calc-input-label">Monthly Ad Spend</label>
+        <input type="range" class="calc-slider" id="adSpend" min="1000" max="20000" step="500" value="5000">
+        <div class="calc-amount" id="spendDisplay">$5,000</div>
+      </div>
+      <div class="calc-results">
+        <div class="calc-result-row">
+          <span class="calc-result-label">Leads Generated (÷ $40 CPL)</span>
+          <span class="calc-result-val" id="leadsVal">125</span>
+        </div>
+        <div class="calc-result-row">
+          <span class="calc-result-label">Booked Assessments (× 70%)</span>
+          <span class="calc-result-val" id="bookedVal">88</span>
+        </div>
+        <div class="calc-result-row">
+          <span class="calc-result-label">New Patients Closed (× 30%)</span>
+          <span class="calc-result-val" id="patientsVal">26</span>
+        </div>
+        <div class="calc-divider"></div>
+        <div class="calc-result-row">
+          <span class="calc-result-label">Monthly Revenue Generated</span>
+          <span class="calc-result-val highlight" id="revenueVal">$91,000</span>
+        </div>
+        <div class="calc-result-row">
+          <span class="calc-result-label">ROI on Ad Spend</span>
+          <span class="calc-result-val highlight" id="roiVal">18.2x</span>
+        </div>
+      </div>
+    </div>
+    <div class="calc-right-content reveal reveal-delay-3">
+      <div class="calc-chart">
+        <div class="chart-title">Patient Pipeline Flow — Monthly</div>
+        <div class="chart-bars" id="chartBars">
+          <div class="chart-bar-wrap">
+            <div class="chart-bar-val" id="barVal1">125</div>
+            <div class="chart-bar-track">
+              <div class="chart-bar" id="bar1"></div>
+            </div>
+            <div class="chart-bar-label">Leads</div>
+          </div>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar-val" id="barVal2">88</div>
+            <div class="chart-bar-track">
+              <div class="chart-bar" id="bar2"></div>
+            </div>
+            <div class="chart-bar-label">Booked</div>
+          </div>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar-val" id="barVal3">26</div>
+            <div class="chart-bar-track">
+              <div class="chart-bar active" id="bar3"></div>
+            </div>
+            <div class="chart-bar-label">Patients</div>
+          </div>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar-val teal" id="barVal4">$91k</div>
+            <div class="chart-bar-track">
+              <div class="chart-bar active" id="bar4"></div>
+            </div>
+            <div class="chart-bar-label">Revenue</div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-formula">
+        <div class="formula-line">
+          <span style="color:rgba(107,105,102,0.6)">AD SPEND</span>
+          <span class="formula-op">÷</span>
+          <span class="formula-val">$40</span>
+          <span style="color:rgba(107,105,102,0.5)">CPL</span>
+          <span class="formula-op">=</span>
+          <span class="formula-val" id="f1">125</span>
+          <span style="color:rgba(107,105,102,0.5)">leads</span>
+        </div>
+        <div class="formula-line">
+          <span class="formula-val" id="f2">125</span>
+          <span style="color:rgba(107,105,102,0.5)">leads</span>
+          <span class="formula-op">×</span>
+          <span class="formula-val">70%</span>
+          <span style="color:rgba(107,105,102,0.5)">book rate</span>
+          <span class="formula-op">=</span>
+          <span class="formula-val" id="f3">88</span>
+          <span style="color:rgba(107,105,102,0.5)">booked</span>
+        </div>
+        <div class="formula-line">
+          <span class="formula-val" id="f4">88</span>
+          <span style="color:rgba(107,105,102,0.5)">booked</span>
+          <span class="formula-op">×</span>
+          <span class="formula-val">30%</span>
+          <span style="color:rgba(107,105,102,0.5)">close</span>
+          <span class="formula-op">=</span>
+          <span class="formula-val" id="f5">26</span>
+          <span style="color:rgba(107,105,102,0.5)">patients</span>
+        </div>
+        <div class="formula-line" style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(2,132,199,0.15);">
+          <span class="formula-val" id="f6">26</span>
+          <span style="color:rgba(107,105,102,0.5)">patients</span>
+          <span class="formula-op">×</span>
+          <span class="formula-val">$3,500</span>
+          <span style="color:rgba(107,105,102,0.5)">avg/patient</span>
+          <span class="formula-op">=</span>
+          <span style="color:var(--teal); font-weight:700;" id="f7">$91,000</span>
+        </div>
+      </div>
+      <div style="margin-top:20px;">
+        <p style="font-family:var(--font-body);font-size:0.78rem;color:var(--gray-400);line-height:1.6;">
+          Based on industry-average $40 CPL, 70% assessment book rate, 30% close rate, and $3,500 average monthly revenue per patient. Results vary by market and agency maturity.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="reveal" style="text-align:center;">
+    <div class="section-label" style="justify-content:center;"><span>Client Results</span></div>
+    <h2 class="section-title" style="margin:0 auto;text-align:center;max-width:100%;">What <em>Others Say</em></h2>
+    <p class="section-sub" style="margin:16px auto 0;text-align:center;">Real operators. Real results. Unfiltered.</p>
+  </div>
+  <div class="testi-track-wrap">
+    <div class="testi-track" id="testiTrack">
+      <!-- 11 testimonials -->
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testi-text">"In our first 60 days we added 14 new patients to our census. I was skeptical about paid ads but the leads that came in were actually qualified — people who needed care now, not tire-kickers."</p>
+        <div class="testi-author">          <div><span class="testi-name">Denise M.</span><span class="testi-role">Owner, Brightway Home Care — Atlanta, GA</span></div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24" style="fill:#ddd;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testi-text">"It took about 6 weeks to really see the pipeline fill up. The first month was a little slow but once the automations kicked in and the reviews started coming, it changed. We went from 3 inquiries a week to 20+."</p>
+        <div class="testi-author">          <div><span class="testi-name">Robert J.</span><span class="testi-role">CEO, Comfort First Home Services — Dallas, TX</span></div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testi-text">"My caregivers are now fully scheduled. We were averaging 22 hours per caregiver per week — now we're at 34. The patients coming in are consistent and we're not scrambling to fill gaps anymore."</p>
+        <div class="testi-author">          <div><span class="testi-name">Patricia A.</span><span class="testi-role">Director, Guardian Care Agency — Miami, FL</span></div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testi-text">"The database reactivation alone paid for the first month. We had leads from 2 years ago we'd totally forgotten about. They reached back out, three of them became clients. That was unexpected."</p>
+        <div class="testi-author">          <div><span class="testi-name">Marcus K.</span><span class="testi-role">Founder, Kinship Home Care — Chicago, IL</span></div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24" style="fill:#ddd;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24" style="fill:#ddd;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testi-text">"Honestly the reporting was overwhelming at first and I had to ask them to simplify it. Once they did, it was much clearer. The patient results are solid though — we added 9 net new clients in 90 days which for our size is significant."</p>
+        <div class="testi-author">          <div><span class="testi-name">Sandra L.</span><span class="testi-role">Owner, Serenity Care Group — Phoenix, AZ</span></div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testi-text">"We went from 41 to 68 active patients in five months. Our revenue crossed $200k MRR for the first time. I had been in business 4 years and couldn't crack that ceiling — this system broke through it."</p>
+        <div class="testi-author">          <div><span class="testi-name">Terrence W.</span><span class="testi-role">CEO, Westgate Home Health — Houston, TX</span></div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testi-text">"The AI intake bot alone is worth the investment. It texts and emails every lead within 60 seconds. My team used to miss leads after hours — now nobody slips through. That's added real money to the top line."</p>
+        <div class="testi-author">          <div><span class="testi-name">Nicole B.</span><span class="testi-role">Director of Ops, Harmony Home Care — Orlando, FL</span></div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24" style="fill:#ddd;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testi-text">"I'll be honest — the onboarding required more from us than I expected. We had to get organized on our end too. But once everything was configured and running, the census growth was real. Up 22% in 4 months."</p>
+        <div class="testi-author">          <div><span class="testi-name">James C.</span><span class="testi-role">Owner, ClearPath Home Services — Charlotte, NC</span></div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testi-text">"The referral program was something I'd tried to build myself and failed. They built it, launched it, and within 6 weeks our top social worker had sent us 4 new clients. It actually works when it's set up right."</p>
+        <div class="testi-author">          <div><span class="testi-name">Lisa R.</span><span class="testi-role">Administrator, Summit Care Network — Denver, CO</span></div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testi-text">"We added 18 patients in 90 days. More importantly, my caregiver utilization went from 58% to 81%. That alone is tens of thousands in additional revenue from the same overhead. These guys understand the home care business model."</p>
+        <div class="testi-author">          <div><span class="testi-name">Anthony O.</span><span class="testi-role">Founder, Pinnacle Home Care — Los Angeles, CA</span></div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="testi-stars">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <svg viewBox="0 0 24 24" style="fill:#ddd;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <p class="testi-text">"The Google reviews went from 12 to 67 in three months. That changed how people perceived us when they searched our name. We're now the most reviewed home care agency in our county and calls just come in organically now too."</p>
+        <div class="testi-author">          <div><span class="testi-name">Gloria F.</span><span class="testi-role">Owner, Faithful Hands Home Care — Nashville, TN</span></div>
+        </div>
+      </div>
+
+      <!-- Duplicate for scroll -->
+      <div class="testi-card">
+        <div class="testi-stars"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <p class="testi-text">"In our first 60 days we added 14 new patients to our census. The leads that came in were actually qualified — people who needed care now, not tire-kickers."</p>
+        <div class="testi-author"><div><span class="testi-name">Denise M.</span><span class="testi-role">Owner, Brightway Home Care — Atlanta, GA</span></div></div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <p class="testi-text">"My caregivers are now fully scheduled. We went from 22 hours per caregiver per week to 34. The patients coming in are consistent and we're not scrambling to fill gaps anymore."</p>
+        <div class="testi-author"><div><span class="testi-name">Patricia A.</span><span class="testi-role">Director, Guardian Care Agency — Miami, FL</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK WITH US -->
+<section id="work-with-us">
+  <div class="section-label">Book a Call</div>
+  <h2 class="section-title">Work <em>with Us</em></h2>
+  <p class="section-sub">Choose a time that works for you. We'll map out your market, review your current census, and show you exactly what's possible in 90 days.</p>
+  <div class="calendar-wrap reveal reveal-delay-2">
+    <iframe src="https://api.leadconnectorhq.com/widget/booking/nVWiUNiqs7eabHXvyAhm" scrolling="no" id="nVWiUNiqs7eabHXvyAhm_1776827508344"></iframe>
+  </div>
+  <script src="https://link.msgsndr.com/js/form_embed.js" type="text/javascript"></script>
+</section>
+
+<!-- FAQ VIDEO -->
+<section id="faq-video" style="background:var(--navy); padding: 80px 5%; text-align:center;">
+
+  <div class="reveal">
+    <div class="section-label" style="justify-content:center; color:var(--teal);">
+      <span>Before You Go</span>
+    </div>
+    <h2 style="font-family:var(--font-head); font-size:clamp(1.9rem,4vw,3rem); font-weight:500; color:var(--white); letter-spacing:-0.02em; line-height:1.15; margin-bottom:12px;">
+      Any questions? <em style="font-style:italic; color:var(--teal);">Watch this.</em>
+    </h2>
+    <p style="font-family:var(--font-body); font-size:1rem; color:rgba(255,255,255,0.5); max-width:480px; margin:0 auto 48px; line-height:1.65;">
+      Everything you need to know about working with us — answered in one place.
+    </p>
+  </div>
+
+  <div class="faq-vsl-wrap reveal reveal-delay-2">
+    <div class="faq-vsl-card">
+      <div class="vsl-header">
+        <div class="vsl-dot"></div>
+        <div class="vsl-dot"></div>
+        <div class="vsl-dot"></div>
+        <span class="vsl-label">PATIENTS PIPELINE — FAQ</span>
+      </div>
+      <div class="faq-vsl-frame">
+        <video
+          id="faqVideo"
+          controls
+          preload="metadata"
+          playsinline
+          style="width:100%; height:100%; display:block; object-fit:cover;"
+        >
+          <source src="https://drive.google.com/uc?export=download&id=1n0QYkoKmHCXnlGGlzrE84ASUIeKpwuFn" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+
+<footer>
+  <a href="#hero" class="footer-brand"><img src="assets/logo.png" alt="Patients Pipeline" class="footer-logo-img"></a>
+  <div class="footer-legal">© 2025 Patients Pipeline. All rights reserved. HIPAA &amp; BAA Compliant.</div>
+  <div class="footer-badges">
+    <span class="footer-badge">HIPAA</span>
+    <span class="footer-badge">BAA</span>
+    <span class="footer-badge">META PARTNER</span>
+    <span class="footer-badge">GOOGLE ADS</span>
+  </div>
+</footer>
+
+<script>
+// ── CLICK RIPPLE ──
+document.addEventListener('click', e => {
+  const r = document.createElement('div');
+  r.className = 'ripple-burst';
+  r.style.left = e.clientX+'px'; r.style.top = e.clientY+'px';
+  document.body.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+});
+
+// ── NAV SCROLL ──
+const nav = document.getElementById('nav');
+const stickyCta = document.getElementById('sticky-cta');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 10);
+  stickyCta.classList.toggle('visible', window.scrollY > 400);
+});
+
+// ── SCROLL REVEAL ──
+const revealEls = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1 });
+revealEls.forEach(el => obs.observe(el));
+
+// ── ROI CALCULATOR ──
+const slider = document.getElementById('adSpend');
+function updateCalc() {
+  const spend = parseInt(slider.value);
+  const leads = Math.round(spend / 40);
+  const booked = Math.round(leads * 0.7);
+  const patients = Math.round(booked * 0.3);
+  const revenue = patients * 3500;
+  const roi = revenue > 0 ? (revenue / spend).toFixed(1) : '0.0';
+
+  // ── Left card values ──
+  document.getElementById('spendDisplay').textContent = '$' + spend.toLocaleString();
+  document.getElementById('leadsVal').textContent = leads.toLocaleString();
+  document.getElementById('bookedVal').textContent = booked.toLocaleString();
+  document.getElementById('patientsVal').textContent = patients.toLocaleString();
+  document.getElementById('revenueVal').textContent = '$' + revenue.toLocaleString();
+  document.getElementById('roiVal').textContent = roi + 'x';
+
+  // ── Formula values ──
+  document.getElementById('f1').textContent = leads.toLocaleString();
+  document.getElementById('f2').textContent = leads.toLocaleString();
+  document.getElementById('f3').textContent = booked.toLocaleString();
+  document.getElementById('f4').textContent = booked.toLocaleString();
+  document.getElementById('f5').textContent = patients.toLocaleString();
+  document.getElementById('f6').textContent = patients.toLocaleString();
+  document.getElementById('f7').textContent = '$' + revenue.toLocaleString();
+
+  // ── Chart bars — all scaled relative to leads (the largest value) ──
+  // Revenue bar is scaled on its own axis (revenue / max_revenue)
+  const maxLeads   = 20000 / 40;          // 500  — absolute max leads at $20k spend
+  const maxRevenue = Math.round(maxLeads * 0.7 * 0.3) * 3500; // max revenue at $20k
+
+  const pLeads    = Math.max(4, Math.min(100, (leads / maxLeads) * 100));
+  const pBooked   = Math.max(4, Math.min(100, (booked / maxLeads) * 100));
+  const pPatients = Math.max(4, Math.min(100, (patients / maxLeads) * 100));
+  const pRevenue  = Math.max(4, Math.min(100, (revenue / maxRevenue) * 100));
+
+  document.getElementById('bar1').style.height = pLeads + '%';
+  document.getElementById('bar2').style.height = pBooked + '%';
+  document.getElementById('bar3').style.height = pPatients + '%';
+  document.getElementById('bar4').style.height = pRevenue + '%';
+
+  // ── Chart value labels ──
+  document.getElementById('barVal1').textContent = leads.toLocaleString();
+  document.getElementById('barVal2').textContent = booked.toLocaleString();
+  document.getElementById('barVal3').textContent = patients.toLocaleString();
+  // Revenue shown in $k format for space
+  const revenueK = revenue >= 1000 ? '$' + Math.round(revenue / 1000) + 'k' : '$' + revenue;
+  document.getElementById('barVal4').textContent = revenueK;
+}
+slider.addEventListener('input', updateCalc);
+updateCalc();
+
+// ── UNDERLINE TEAL TRIGGER ──
+document.querySelectorAll('.underline-teal').forEach(el => {
+  const o = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting) el.classList.add('visible');
+  }, {threshold: 0.5});
+  o.observe(el);
+});
+</script>
+</body>
+</html>
